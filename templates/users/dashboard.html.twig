@@ -1,0 +1,491 @@
+{% extends 'frontend.html.twig' %}
+
+{% block title %}Profile at todo-app!{% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+    <style>
+        .ul_todos{background: gray; }
+        .li_todo{ }
+        .completed { text-decoration: line-through; }
+        .input_todo{ border:0px solid black; width:100% }
+        .input_todo:hover, .input_todo:focus { border:1px solid; width:100%; background: lightyellow; }
+        .icon { width:18px;} 
+        .left { float: left; margin-top: .3rem;}
+        .left2 {
+            overflow: hidden;
+            display: block;
+            padding: 0 4px 0 10px;
+        }
+        .left2 input {
+            width: 100%;
+        }
+        
+    </style>
+{% endblock stylesheets %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="content-dash">
+        
+        <div id="app" style='visibility:hidden;' v-bind:style="{ visibility: visibility }">
+            <h1> Lista de Todos </h1> <button id="showModalEditConfig" @click="showModalEditConfig=true">Config</button><button id="filters">Filters</button>
+            <table class='table table-stripered table-bordered'>
+                <thead>
+                    <tr>
+                        <td style='width:50px;'></td>
+                        
+                        <td style='width:100%;'>Todo</td> <!--<button style="float:right;">Filters</button></td> -->
+                        <td class="col_date_start" v-if="config.showDateStart=='true'">Date Start</td>
+                        <td v-if="config.showDateFinish=='true'">Date Finish</td>
+                        <td style='width:50px;'>Actions</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-if="isEmpty()"><td></td><td>Empty</td></tr>
+                    <tr v-for="(item, index) in visiblesTodos" :idtodo="item.id_todo">
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" :state="item.state" :index="index" :checked="item.state" @click="toggleState(item)">
+                            </div>
+                        </td>
+                        <td><input type='text' class='input_todo' :class="{ completed: item.state  }" :value="item.text" :init-value="item.text" @change="changedTodo(item, $event)"></td>
+                        <td class="col_date_start" v-if="config.showDateStart=='true'">${ item.date_start.date}</td>
+                        <td v-if="config.showDateFinish=='true'">${ item.date_finish===null ? "" : item.date_finish.date }</td>
+                        <td><img class='icon' id='showModalEditTodo' @click="showModalEditTodo=true;ModalEditTodoIndex=index;" src="{{ asset('images/edit_icon.png') }}"><img class='icon' @click="deleteTodo(item.id_todo, index)" src="{{ asset('images/delete_icon.png') }}"></td>
+                    </tr>
+                    <tr v-if="todos.length!=0 && config.numRows<todos.length"><td :colspan="numTableCols" @click="config.numRows+=5">More</td></tr>
+                </tbody>                
+                <tfoot>
+                    <tr>
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" :checked="config.showAll" @click="toggleShowAll()">
+                            </div>
+                        </td>
+                        <td :colspan="numTableCols-2">Show all</td>
+                        <td><img @click="addTodo" class='icon' src="{{ asset('images/add_icon.png') }}"></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <!-- <button id="show-modal" @click="showModal = true">Show Modal</button> -->
+            <!-- use the modal component, pass in the prop -->
+            <modal v-if="showModalEditTodo" @close="showModalEditTodo = false">
+                <!--
+                you can use custom content here to overwrite
+                default content
+                
+                <h3 slot="header">Editar Todo</h3>
+                <h3 slot="body">Texto</h3> 
+                <h3 slot="footer">Guardar</h3> -->
+                <h3 slot="header">Editar Todo</h3>
+                <div slot="body">
+                    <!-- id _todo ${ this.ModalData.id_todo } <br> -->
+                    Id <span>${todos[ModalEditTodoIndex].id_todo}</span><br>
+                    Estado <input type='checkbox' v-model="todos[ModalEditTodoIndex].state" @click="toggleState(todos[ModalEditTodoIndex])">
+                    <span v-if="todos[ModalEditTodoIndex].state==1"> Completed</span><span v-else> Uncompleted</span><br>
+                    <div>
+                        <label class="left" for="modal_todo">Todo:</label>
+                        <span class="left2"><input type="text" id='modal_todo' name='modal_todo' style="float:left;width:100%;" v-model="todos[ModalEditTodoIndex].text"></span>
+                    </div>
+                    <div style='clear:left'>Details <textarea style='resize:vertical;width:100%' v-model="todos[ModalEditTodoIndex].details"></textarea></div><br>
+                    <table>
+                    <tr><td>Fecha Creación</td>
+                        <td><input type='date' disabled :value="PHPdatetimetoJSdate(todos[ModalEditTodoIndex].date_creation.date)">
+                            <input type='time' disabled :value="PHPdatetimetoJStime(todos[ModalEditTodoIndex].date_creation.date)">
+                        </td>
+                    </tr>
+                    <tr><td>Fecha Inicio </td><td>
+                    <div style="display:inline-block;" v-if="todos[ModalEditTodoIndex].date_start!==null">
+                        <input type='date' :value="PHPdatetimetoJSdate(todos[ModalEditTodoIndex].date_start.date)" @change="changedDate_Start(ModalEditTodoIndex, $event)">
+                        <input type='time' :value="PHPdatetimetoJStime(todos[ModalEditTodoIndex].date_start.date)" @change="changedDate_Start(ModalEditTodoIndex, $event)">
+                    </div>
+                    <div style="display:inline-block;" v-else>
+                        <input type='date' @change="changedDate_Start(ModalEditTodoIndex, $event)">
+                        <input type='time' @change="changedDate_Start(ModalEditTodoIndex, $event)">
+                    </div>
+                    </td></tr>
+                    <tr><td>Fecha Final </td><td>
+                    <div style="display:inline-block;" v-if="todos[ModalEditTodoIndex].date_finish!==null">
+                        <input type='date' :value="PHPdatetimetoJSdate(todos[ModalEditTodoIndex].date_finish.date)"  @change="changedDate_Finish(ModalEditTodoIndex, $event)">
+                        <input type='time' :value="PHPdatetimetoJStime(todos[ModalEditTodoIndex].date_finish.date)"  @change="changedDate_Finish(ModalEditTodoIndex, $event)">
+                    </div>
+                    <div style="display:inline-block;" v-else>
+                        <input type='date' @change="changedDate_Finish(ModalEditTodoIndex, $event)">
+                        <input type='time' @change="changedDate_Finish(ModalEditTodoIndex, $event)">
+                    </div>
+                    </td></tr>
+                    </table>
+                </div> 
+                <div slot="footer">
+                    
+                    <button class="modal-default-button" @click="saveEditedTodo(ModalEditTodoIndex)"> <!-- showModal = false o @click="$emit('close')"-->
+                            Guardar
+                    </button>
+                </div>
+            </modal>
+
+            <modal v-if="showModalEditConfig" @close="showModalEditConfig = false">
+                <!--
+                you can use custom content here to overwrite
+                default content
+                
+                <h3 slot="header">Editar Todo</h3>
+                <h3 slot="body">Texto</h3> 
+                <h3 slot="footer">Guardar</h3> -->
+                <h3 slot="header">Editar Config</h3>
+                <div slot="body">
+                    <table>
+                        <tr><td>NumRows</td><td><input type="number" v-model="config.numRows"></td></tr>
+                        <tr><td>showAll</td><td><input type="checkbox" v-model="config.showAll" @click="toggleShowAll()"></td></tr>
+                        <tr><td>showDateStart</td><td>
+                            <input type="radio" name="configshowDateStart" v-model="config.showDateStart" value="true" > Yes
+                            <input type="radio" name="configshowDateStart" v-model="config.showDateStart" value="false"> No
+                        </td>
+                        <tr><td>showDateFinish</td><td>
+                            <input type="radio" name="configshowDateFinish" v-model="config.showDateFinish" value="true" > Yes
+                            <input type="radio" name="configshowDateFinish" v-model="config.showDateFinish" value="false"> No
+                        </td></tr>
+                    </table>
+                </div> 
+                <div slot="footer">
+                    
+                    <button class="modal-default-button" @click="saveEditedConfig"> <!-- showModal = false o @click="$emit('close')"-->
+                            Guardar
+                    </button>
+                </div>
+            </modal>
+        </div>     
+    </div>
+{% endblock body %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.0"></script>
+    <script type="text/javascript">
+        // register modal component
+        Vue.component('modal', {
+            template: '#modal-template-edit-todo'
+        })
+        var app = new Vue({
+            el: '#app',
+            delimiters: ['${', '}'],
+            data: {
+                todos: [],
+                visibility: "hidden", //table                
+                empty: true,
+                showModalEditTodo: false,
+                showModalEditConfig: false,
+                ModalEditTodoIndex: "",
+                config: { numRows: {{ app.user.confignumrows }}, showAll: {{ app.user.configshowall }}, showDateStart: "{{ app.user.configshowdatestart  ? "true": "false" }}", showDateFinish: "{{ app.user.configshowdatefinish ? "true": "false" }}"  } //showAll -> just uncompleted (0) or completed (1)
+                //filters: { byDateStart: null, byDateFinish: null, byDateCreation: null }
+            },
+            created: function(){
+                this.load();
+                    
+            },
+            // define methods under the `methods` object
+            methods: {
+                toggleState: function (item) {
+                    //alert(item.state);
+                // `this` inside methods points to the Vue instance
+                    if (item.state==0){ item.state=1; } else if (item.state==1){ item.state=0; }
+                    //save
+                    var params = { id_todo: item.id_todo, state: item.state };
+                    this.$http.post('/api/todos/edit', params).then(response => {
+                        // success callback                        
+                    }, response => {
+                        // error callback                        
+                    });
+                },
+                toggleShowAll: function(){
+                    if (this.config.showAll==0){ this.config.showAll=1; } else if (this.config.showAll==1){ this.config.showAll=0; }                    
+                    this.load();
+                    //Falta enviar post para guardar config usuario
+                },
+                load: function (){
+                    var params = { showAll: this.config.showAll };
+                    this.$http.post('/api/todos/list', params).then(response => {
+                        // success callback
+                        // clear response.body
+                        this.todos=response.body;
+                        this.visibility="visible";
+                    }, response => {
+                        // error callback
+                        this.todos=[];
+                        this.visibility="visible";
+                        //alert("Error downloading data");
+                        //
+                    });
+                },
+                makeEditable: function(event){
+                    //alert(element);
+                    console.log(event);
+                    /*
+                    if (event.target.nodeName=="SPAN"){
+                        event.target.parentElement.setAttribute("contenteditable", "true");
+                        event.target.parentElement.setAttribute("style", "background-color: yellow;");
+                        event.target.focus();
+                        //focus span
+
+                    }else{
+                        event.target.setAttribute("contenteditable", "true");
+                        event.target.setAttribute("style", "background-color: yellow;");
+                        event.target.childNodes[0].focus();
+                        //focus span
+                    }
+                    */
+                },
+                changedTodo: function(item, event){
+                    //console.log(item);
+                    //console.log(event);
+                    //alert(event.target.getAttribute("init-value"));
+                    
+                    if (event.target.value!=event.target.getAttribute("init-value")){
+                        //alert("cambio");
+                        item.text=event.target.value;
+                        event.target.setAttribute("style", "color: red;");
+                        //Guardar
+                        var params = { id_todo: item.id_todo, text: event.target.value };
+                        this.$http.post('/api/todos/edit', params).then(response => {
+                            // success callback
+                            //alert(response.body);                        
+                            if (response.body=="Updated") {
+                                //alert("Updated");
+                                event.target.setAttribute("init-value", event.target.value);
+                                event.target.setAttribute("style", "color: inherited;");
+                            }
+                        }, response => {
+                            // error callback
+                            alert("Connect Error")
+                        });
+                    }else{
+                        event.target.setAttribute("style", "color: inherited;");
+                    }                    
+                },
+                updateTodo: function(item){
+                        //alert("Updating");
+                        var params = { id_todo: item.id_todo, text: item.text, details: item.details, date_start: item.date_start, date_finish: item.date_finish };
+                        //console.log("updating...");
+                        this.$http.post('/api/todos/edit', params).then(response => {                       
+                            if (response.body=="Updated") {
+                                //alert("Updated");
+                                if (this.showModalEditTodo=true) { this.showModalEditTodo=false; }
+                            }
+                        }, response => {
+                            // error callback
+                            alert("Connect Error")
+                        });          
+                        //console.log("supuesto despues de la respuesta");
+                },
+                isEmpty: function(){
+                    if (typeof this.todos !== 'undefined' && this.todos.length > 0) {
+                        // the array is defined and has at least one element
+                        return false;
+                    } else { 
+                        return true;
+                    }
+                },
+                addTodo: function(){
+                    //firts create and then load
+                    this.$http.get('/api/todos/create').then(response => {
+                        // success callback
+                        //alert(response.body);
+                        this.todos.push(response.body);
+                        /*
+                        if (!isNaN(response.body) {
+                            this.todos.push({"id_todo":response.body, "text": "nuevo", "creator":"1", "state": 0})
+                        }
+                        */
+                        //alert(response.body);
+                    }, response => {
+                        // error callback
+                        //this.todos=[];
+                        alert("Connect Error")
+                        //alert("Error downloading data");
+                        //
+                    });
+
+                },
+                deleteTodo: function(id_todo, index){
+                    //alert(index);
+                    
+                    //firts create and then load
+                    var params = { id_todo: id_todo };
+                    this.$http.post('/api/todos/delete', params).then(response => {
+                        // success callback
+                        //alert(response.body);                        
+                        if (response.body=="Deleted") {
+                            this.todos.splice(index,1);
+                        }
+                    }, response => {
+                        // error callback
+                        alert("Connect Error")
+                    });
+                },/*
+                modalEditTodo: function(index){
+                    this.showModal = true;
+                    //this.ModalData = item;
+                    this.ModalEditTodoIndex=index;
+                    //console.log(index);
+
+                }*/
+                saveEditedTodo: function (index){
+                    //alert("Guardando datos");
+                    this.updateTodo(this.todos[index]);
+                    //this.showModal=false;
+                },
+                saveEditedConfig: function (){
+                    //alert("Guardando datos");
+                    var params = { numRows: this.config.numRows, showAll: this.config.showAll, showDateStart: this.config.showDateStart, showDateFinish: this.config.showDateFinish };
+                    //console.log("updating...");
+                    this.$http.post('/api/users/config', params).then(response => {                       
+                        if (response.body=="Updated") {
+                            //alert("Updated");
+                            if (this.showModalEditConfig==true) { this.showModalEditConfig=false; }
+                        }
+                    }, response => {
+                        // error callback
+                        alert("Connect Error")
+                    });    
+                    //this.showModalEditConfig=false;
+                },
+                PHPdatetimetoJSdate: function(datetime){
+                    if (datetime == null){ return null}
+                    //var date= new Date(Date.parse(datetime));
+                    var date = new Date(datetime);
+                    var year = date.getFullYear();
+                    var month = date.getMonth()+1;
+                    var day = date.getDate();
+
+                    if (day < 10) { day = '0' + day; }
+                    if (month < 10) { month = '0' + month; }
+
+                    var formattedDate = year + '-' + month + '-' + day;
+                    //alert(formattedDate);
+                    return formattedDate;
+
+                },
+                PHPdatetimetoJStime: function(datetime){
+                    if (datetime ==null){ return null}
+                    var date = new Date(datetime);
+                    var hour = date.getHours();
+                    var mins = date.getMinutes();
+                    var secs = date.getSeconds();
+
+                    if (hour<10){ hour="0"+hour; }
+                    if (mins<10){ mins="0"+mins; }
+                    if (secs<10){ secs="0"+secs; }
+
+                    var formattedTime= hour+":"+mins;
+                    //alert(formattedTime);
+                    return formattedTime;
+                },
+                JSdatetoPHPdatetime: function(new_date, old_datetime){
+                    if (new_date == null){ return null }
+                    //var date= new Date(Date.parse(datetime)); 
+                    // PHPdatetime -> 2018-05-18 13:38:34.000000
+                    if (old_datetime!==null && old_datetime!=="") { var datetime = new Date(old_datetime); }else{ var datetime = new Date(); }
+                    var date = new Date(new_date);
+
+                    var year = date.getFullYear();
+                    var month = date.getMonth()+1;
+                    var day = date.getDate();                    
+                    var hour = datetime.getHours();
+                    var mins = datetime.getMinutes();
+                    var secs = datetime.getSeconds();
+
+                    if (day < 10) { day = '0' + day; }
+                    if (month < 10) { month = '0' + month; }
+                    if (hour<10){ hour="0"+hour; }
+                    if (mins<10){ mins="0"+mins; }
+                    if (secs<10){ secs="0"+secs; }
+
+                    var formattedDate = year + '-' + month + '-' + day + " " + hour + ":" + mins + ":" + secs;
+                    //alert(formattedDate);
+                    return formattedDate;
+
+                },
+                JStimetoPHPdatetime: function(new_time, old_datetime){
+                    if (new_time == null){ return null }
+
+                    //console.log(new_time);
+                    //return null;
+                    //var date= new Date(Date.parse(datetime)); 
+                    // PHPdatetime -> 2018-05-18 13:38:34.000000
+                    if (old_datetime!==null && old_datetime!=="") { var datetime = new Date(old_datetime); }else{ var datetime = new Date(); }
+                    var time =new_time.split(":");
+                    //console.log(time);
+
+                    var year = datetime.getFullYear();
+                    var month = datetime.getMonth()+1;
+                    var day = datetime.getDate();                    
+                    var hour = time[0];
+                    var mins = time[1];
+                    var secs = "0";
+
+                    if (day < 10) { day = '0' + day; }
+                    if (month < 10) { month = '0' + month; }
+                    if (hour.length==1 && hour<10){ hour="0"+hour; }
+                    if (mins.length==1 && mins<10){ mins="0"+mins; }
+                    if (secs.length==1 && secs<10){ secs="0"+secs; }
+
+                    var formattedDate = year + '-' + month + '-' + day + " " + hour + ":" + mins + ":" + secs;
+                    //console.log(formattedDate);
+                    return formattedDate;
+
+                },
+                changedDate_Start: function (index, event){
+                    if(event.target.type=="date"){
+                        //validate date
+                        var new_date = event.target.value;
+                        if (this.todos[index].date_start===null){ this.todos[index].date_finish={date: ""}}
+                        this.todos[index].date_start.date=this.JSdatetoPHPdatetime(new_date,this.todos[index].date_start.date);
+                    }else{
+                        var new_time=event.target.value;
+                        if (/^[0-9]{2}:[0-9]{2}$/.test(new_time)){
+                            if (this.todos[index].date_start===null){ this.todos[index].date_start={date: ""}}                            
+                            this.todos[index].date_start.date=this.JStimetoPHPdatetime(event.target.value,this.todos[index].date_start.date);
+                            
+                        }
+                    }
+                },
+                changedDate_Finish: function (index, event){
+                    if(event.target.type=="date"){
+                        //validate date
+                        var new_date = event.target.value;
+                        if (this.todos[index].date_finish===null){ this.todos[index].date_finish={date: ""}}
+                        this.todos[index].date_finish.date=this.JSdatetoPHPdatetime(new_date,this.todos[index].date_finish.date);
+                    }else{
+                        var new_time=event.target.value;
+                        if (/^[0-9]{2}:[0-9]{2}$/.test(new_time)){
+                            if (this.todos[index].date_finish===null){ this.todos[index].date_finish={date: ""}}
+                            this.todos[index].date_finish.date=this.JStimetoPHPdatetime(event.target.value,this.todos[index].date_finish.date);
+                        }
+                    }
+                }
+            },
+            watch: {
+                'todos': function (newvalue, oldvalue){
+                    console.log(newvalue);
+                },
+                deep: true
+            }, 
+            computed: {
+                visiblesTodos () {
+                    return this.todos.slice(0, this.config.numRows);
+                },
+                numTableCols () {
+                    var num = 3;
+                    if (this.config.showDateStart=="true"){ num = num+1; }
+                    if (this.config.showDateFinish=="true"){ num = num+1; }
+                    return num;
+                }
+            }
+        })
+
+    </script>
+
+{% include 'vuejs/modal_edit_todo.js' %}
+{% endblock javascripts %}

@@ -1,0 +1,22 @@
+{% extends 'frontend.html.twig' %}
+
+{% block title %}Enjoy our todo-app!{% endblock %}
+
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock stylesheets %}
+
+{% block body %}
+{{ parent() }}
+<div class="content">
+      <div class="jumbotron">
+        <h1>Enjoy our todo-app!</h1>
+        <p class="lead">This is a simple app for TODOs. Done with the PHP framework Symfony4 (Twig Templates, Doctrine ORM) and a little of VueJS for learning purposes.</p>
+         <a href='/'>Home</a><br>
+            <a href='profile'>Profile</a><br>
+            <a href='login'>Login</a><br>
+            <a href='logout'>Logout</a><br>
+      </div>
+    </div>
+{% endblock %}

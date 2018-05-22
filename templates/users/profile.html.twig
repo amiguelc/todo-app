@@ -1,0 +1,30 @@
+{% extends 'frontend.html.twig' %}
+
+{% block stylesheets %}
+{{ parent() }}
+    <style>
+  
+    </style>
+{% endblock stylesheets %}
+
+
+{% block title %}Profile at todo-app!{% endblock %}
+{% block body %}
+{{ parent() }}
+<div class="content">
+    <h1>Profile</h1>
+    <table>
+        <tr><td>Email</td> <td>{{ app.user.email }}</td></tr>
+        <tr><td>Username</td><td>{{ app.user.nickname }}</td></tr>
+        <tr><td>Name</td><td> <input id='nick' name='nick' type="text" value="{{ app.user.name }}"></td></tr>
+        <tr><td>Verified Email</td><td>{% if app.user.emailVerified == true %}Si{% else %}No{% endif %}</td></tr>
+        <tr><td>Total Todos</td><td> {{ total_todos }}</td>
+        <tr><td>ShowAll</td><td>{{ app.user.configshowall }}</td></tr>
+        <tr><td>NumRows</td><td>{{ app.user.confignumrows }}</td></tr>
+        <tr><td>ShowDateStart</td><td>{{ app.user.configshowdatestart }}</td></tr>
+        <tr><td>ShowDateFinish</td><td>{{ app.user.configshowdatefinish }}</td></tr>
+    </table>
+</div>
+{% endblock body %}
+
+
