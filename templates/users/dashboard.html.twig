@@ -193,7 +193,7 @@
                     if (item.state==0){ item.state=1; } else if (item.state==1){ item.state=0; }
                     //save
                     var params = { id_todo: item.id_todo, state: item.state };
-                    this.$http.post('/api/todos/edit', params).then(response => {
+                    this.$http.post('api/todos/edit', params).then(response => {
                         // success callback                        
                     }, response => {
                         // error callback                        
@@ -206,7 +206,7 @@
                 },
                 load: function (){
                     var params = { showAll: this.config.showAll };
-                    this.$http.post('/api/todos/list', params).then(response => {
+                    this.$http.post('api/todos/list', params).then(response => {
                         // success callback
                         // clear response.body
                         this.todos=response.body;
@@ -248,7 +248,7 @@
                         event.target.setAttribute("style", "color: red;");
                         //Guardar
                         var params = { id_todo: item.id_todo, text: event.target.value };
-                        this.$http.post('/api/todos/edit', params).then(response => {
+                        this.$http.post('api/todos/edit', params).then(response => {
                             // success callback
                             //alert(response.body);                        
                             if (response.body=="Updated") {
@@ -268,7 +268,7 @@
                         //alert("Updating");
                         var params = { id_todo: item.id_todo, text: item.text, details: item.details, date_start: item.date_start, date_finish: item.date_finish };
                         //console.log("updating...");
-                        this.$http.post('/api/todos/edit', params).then(response => {                       
+                        this.$http.post('api/todos/edit', params).then(response => {                       
                             if (response.body=="Updated") {
                                 //alert("Updated");
                                 if (this.showModalEditTodo=true) { this.showModalEditTodo=false; }
@@ -289,7 +289,7 @@
                 },
                 addTodo: function(){
                     //firts create and then load
-                    this.$http.get('/api/todos/create').then(response => {
+                    this.$http.get('api/todos/create').then(response => {
                         // success callback
                         //alert(response.body);
                         this.todos.push(response.body);
@@ -313,7 +313,7 @@
                     
                     //firts create and then load
                     var params = { id_todo: id_todo };
-                    this.$http.post('/api/todos/delete', params).then(response => {
+                    this.$http.post('api/todos/delete', params).then(response => {
                         // success callback
                         //alert(response.body);                        
                         if (response.body=="Deleted") {
@@ -340,7 +340,7 @@
                     //alert("Guardando datos");
                     var params = { numRows: this.config.numRows, showAll: this.config.showAll, showDateStart: this.config.showDateStart, showDateFinish: this.config.showDateFinish };
                     //console.log("updating...");
-                    this.$http.post('/api/users/config', params).then(response => {                       
+                    this.$http.post('api/users/config', params).then(response => {                       
                         if (response.body=="Updated") {
                             //alert("Updated");
                             if (this.showModalEditConfig==true) { this.showModalEditConfig=false; }

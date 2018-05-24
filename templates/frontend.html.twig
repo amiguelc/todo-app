@@ -58,11 +58,11 @@
     -->
 
     <div class="topnav" id="myTopnav">
-    <a href="/" class="active">Todo-app</a>
-    <a href="/profile">Profile</a>
-    <a href="/about">About</a>
+    <a href="" class="active">Todo-app</a>
+    <a href="profile">Profile</a>
+    <a href="about">About</a>
     {% if is_granted("ROLE_USER") %}
-                <a style='float:right;' href="/logout">Logout</a> <a style='float:right;' href="/profile">{{ app.user.email }}</a>
+                <a style='float:right;' href="logout">Logout</a> <a style='float:right;' href="profile">{{ app.user.email }}</a>
             {% else %}
                 <a style='float:right;' href='login'>Login</a><a style='float:right;' href='register'>Register</a></span>
             {% endif %}
