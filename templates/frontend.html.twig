@@ -57,23 +57,23 @@
     </nav>
     -->
 
-    <div class="topnav" id="myTopnav">
-    <a href="" class="active">Todo-app</a>
-    <a href="profile">Profile</a>
-    <a href="about">About</a>
+<div class="topnav" id="myTopnav">
+    <a href="{{ path("home") }}" class="active">Todo-app</a>
+    {% if is_granted("ROLE_USER") %}<a href="profile">{% trans %}Profile{% endtrans %}</a>{% endif %}
+    <a href="about">{% trans %}About us{% endtrans %}</a>
     {% if is_granted("ROLE_USER") %}
-                <a style='float:right;' href="logout">Logout</a> <a style='float:right;' href="profile">{{ app.user.email }}</a>
-            {% else %}
-                <a style='float:right;' href='login'>Login</a><a style='float:right;' href='register'>Register</a></span>
-            {% endif %}
+        <a style='float:right;' href="logout">{% trans %}Logout{% endtrans %}</a> <a style='float:right;' href="profile">{{ app.user.email }}</a>
+    {% else %}
+        <a style='float:right;' href='login'>{% trans %}Login{% endtrans %}</a><a style='float:right;' href='register'>{% trans %}Register{% endtrans %}</a></span>
+    {% endif %}
     <a href="javascript:void(0);" class="icon" onclick="myFunction()">
-        <i class="fa fa-bars"></i>
+    <i class="fa fa-bars"></i>
     </a>    
-    </div>
-    {% endblock navbar %}   
-    {% block footer %} 
-    <footer id='footer' class='footer'>Todo App 2018</footer>
-    {% endblock footer %}   
+</div>
+{% endblock navbar %}   
+{% block footer %} 
+<footer id='footer' class='footer'>Todo App 2018</footer>
+{% endblock footer %}   
 {% block body %}
 {{ parent() }}   
     

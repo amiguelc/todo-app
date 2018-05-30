@@ -37,6 +37,7 @@ class SecurityController extends Controller
             ))
             ->add('nickname', TextType::class)
             ->add('name', TextType::class)
+            ->add('locale', TextType::class)
             ->add('save', SubmitType::class, array('label' => 'Register'))
             ->getForm();
 

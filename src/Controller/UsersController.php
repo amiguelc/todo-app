@@ -33,12 +33,12 @@ class UsersController extends Controller
      */
     public function home()
     {
+        //$translator = $this->get('translator');
+        //$translator->setLocale('es_ES');
         if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $this->redirectToRoute('dashboard');
         }else{
-            return $this->render('static/home.html.twig', [
-                'email' => 'asdr1'
-            ]);
+            return $this->render('static/home.html.twig');
         }
     }
 

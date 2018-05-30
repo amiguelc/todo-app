@@ -15,7 +15,7 @@ class Users implements UserInterface, \Serializable
      * @ORM\GeneratedValue()
      * @ORM\Column(type="bigint")
      */
-    private $id_user;
+    private $idUser;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
@@ -74,6 +74,10 @@ class Users implements UserInterface, \Serializable
      */
     private $configShowDateFinish = false;
 
+    /**
+     * @ORM\Column(type="string", length=20)
+     */
+    private $locale = "en";
 
     public function __construct()
     {
@@ -84,17 +88,17 @@ class Users implements UserInterface, \Serializable
 
     public function getId()
     {
-        return $this->id_user;
+        return $this->idUser;
     }
 
     public function getIdUser(): ?string
     {
-        return $this->id_user;
+        return $this->idUser;
     }
 
-    public function setIdUser(string $id_user): self
+    public function setIdUser(string $idUser): self
     {
-        $this->id_user = $id_user;
+        $this->idUser = $idUser;
 
         return $this;
     }
@@ -232,7 +236,17 @@ class Users implements UserInterface, \Serializable
 
         return $this;
     }
+    public function getLocale(): ?string
+    {
+        return $this->locale;
+    }
 
+    public function setLocale(string $locale): self
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
 
     public function getSalt()
     {
@@ -254,7 +268,7 @@ class Users implements UserInterface, \Serializable
     public function serialize()
     {
         return serialize(array(
-            $this->id_user,
+            $this->idUser,
             $this->email,
             $this->password,
             // see section on salt below
@@ -266,7 +280,7 @@ class Users implements UserInterface, \Serializable
     public function unserialize($serialized)
     {
         list (
-            $this->id_user,
+            $this->idUser,
             $this->email,
             $this->password,
             // see section on salt below

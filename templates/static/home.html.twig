@@ -11,12 +11,8 @@
 {{ parent() }}
 <div class="content">
       <div class="jumbotron">
-        <h1>Enjoy our todo-app!</h1>
-        <p class="lead">This is a simple app for TODOs. Done with the PHP framework Symfony4 (Twig Templates, Doctrine ORM) and a little of VueJS for learning purposes.</p>
-         <a href='/'>Home</a><br>
-            <a href='profile'>Profile</a><br>
-            <a href='login'>Login</a><br>
-            <a href='logout'>Logout</a><br>
+        <h1>{% trans %}Enjoy our todo-app!{% endtrans %}</h1>
+        <p class="lead">{% trans %}A simple todo-app done with Symfony4 (Doctrine ORM, Twig Templates...) and a little of VueJS for learning purposes{% endtrans %}.</p>
       </div>
-    </div>
+</div>
 {% endblock %}

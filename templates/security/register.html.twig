@@ -46,6 +46,11 @@
         <td>{{ form_widget(form.nickname) }}</td>
     </tr>
     <tr>
+        <td>{{ form_label(form.locale) }}</td>
+        <td>{{ form_errors(form.locale) }}</td>
+        <td>{{ form_widget(form.locale) }}</td>
+    </tr>
+    <tr>
         <td>{{ form_label(form.name) }}</td>
         <td>{{ form_errors(form.name) }}</td>
         <td>{{ form_widget(form.name) }}</td>

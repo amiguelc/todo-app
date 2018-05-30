@@ -1,5 +1,7 @@
 {% extends 'frontend.html.twig' %}
 
+{# {% set locale = app.request.locale %} #}
+
 {% block title %}About todo-app!{% endblock %}
 
 
@@ -10,9 +12,11 @@
 {% block body %}
 {{ parent() }}
 <div class="content">
-    <div class="jumbotron">
-      <h1>Who are we?</h1>
-      <p class="lead">A developer learning... </p>
+<div class="jumbotron">
+    <h1>Todo-app</h1>
+    <p class="lead">{% trans %}A simple todo-app done with Symfony4 (Doctrine ORM, Twig Templates...) and a little of VueJS for learning purposes{% endtrans %}.</p>
+    <h2>{% trans %}Who are we?{% endtrans %}</h2>
+    <p class="lead"> {% trans %}A developer learning...{% endtrans %}</p>
     </div>
 </div>
 {% endblock %}

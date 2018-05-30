@@ -17,6 +17,7 @@
         <tr><td>Email</td> <td>{{ app.user.email }}</td></tr>
         <tr><td>Username</td><td>{{ app.user.nickname }}</td></tr>
         <tr><td>Name</td><td> <input id='nick' name='nick' type="text" value="{{ app.user.name }}"></td></tr>
+        <tr><td>Locale</td><td>{{ app.user.locale }}</td></tr>
         <tr><td>Verified Email</td><td>{% if app.user.emailVerified == true %}Si{% else %}No{% endif %}</td></tr>
         <tr><td>Total Todos</td><td> {{ total_todos }}</td>
         <tr><td>ShowAll</td><td>{{ app.user.configshowall }}</td></tr>
