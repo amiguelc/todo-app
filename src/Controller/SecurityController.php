@@ -16,6 +16,8 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+//use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class SecurityController extends Controller
@@ -37,7 +39,12 @@ class SecurityController extends Controller
             ))
             ->add('nickname', TextType::class)
             ->add('name', TextType::class)
-            ->add('locale', TextType::class)
+            ->add('locale', ChoiceType::class, array(
+                'choices' => array(
+                    'English' => 'en',
+                    'Spanish' => 'es_ES',
+                )
+            ))            
             ->add('save', SubmitType::class, array('label' => 'Register'))
             ->getForm();
 

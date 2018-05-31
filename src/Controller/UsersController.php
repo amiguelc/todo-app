@@ -13,6 +13,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Security\Core\User\UserInterface;
 //use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 //use Symfony\Component\HttpFoundation\JsonResponse;
+//use Symfony\Component\Form\Extension\Core\Type\LocaleType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class UsersController extends Controller
 {
@@ -23,9 +25,60 @@ class UsersController extends Controller
      */
     public function profile(UserInterface $user)
     {
+        //return new Response(var_dump($_SESSION));
+        $request = Request::createFromGlobals();
+        if ($request->isMethod('POST')) {
+            $params = array();
+            $content = $request->getContent();
+            
+            if (!empty($content)){
+                $params = json_decode($content, true);
+                //return new Response(var_dump($content));
+                if (isset($params['locale']) && isset($params['_token'])){
+                    //return new Response(var_dump($params));
+                    $submittedToken = $params['_token'];
+
+                    // 'delete-item' is the same value used in the template to generate the token
+                    if ($this->isCsrfTokenValid('form_locale', $submittedToken)) {
+                        // ... do something, like deleting an object
+                        $user->setLocale($params['locale']);
+                        $this->get('session')->set('_locale', $params['locale']);
+                        $entityManager = $this->getDoctrine()->getManager();
+                        $entityManager->persist($user);
+                        $entityManager->flush();
+                        
+                        return new Response("Updated");
+                    }                   
+                    
+                }
+
+            }
+        }
+        $defaults = array('locale' => $user->getLocale());
+        $form = $this->createFormBuilder($defaults, $options = array(
+                // enable/disable CSRF protection for this form
+                'csrf_protection' => true,
+                // the name of the hidden HTML field that stores the token
+                'csrf_field_name' => '_token',
+                // an arbitrary string used to generate the value of the token
+                // using a different string for each form improves its security
+                'csrf_token_id'   => 'form_locale'
+            ))
+            ->add('locale', ChoiceType::class, array(
+                'choices' => array(
+                    'English' => 'en',
+                    'Spanish' => 'es_ES',
+                ),
+                'attr' => array('onChange' => 'saveLocale(this)'),
+            ))
+            ->getForm();
+        
+
         $count = $this->getDoctrine()->getRepository(Todos::class)->countTodos($user->getIdUser());
+
         return $this->render('users/profile.html.twig', [
-            'total_todos' => $count[1]
+            'total_todos' => $count[1],
+            'form' => $form->createView()
         ]);
     }
     /**
