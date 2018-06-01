@@ -15,13 +15,12 @@ class StaticController extends Controller
      */
     public function about(Request $request)
     {
-        //$translator = $this->get('translator');
-        //$translator->setLocale('es_ES');
-        //return new Response(var_dump($translator));
-        //$request->setLocale("es_ES");
-        //return new Response(dump($user));
-        return $this->render('static/about.html.twig', [
-            'controller_name' => 'StaticController',
-        ]);
+        $response = $this->render('static/about.html.twig');
+
+        $expireDate= new \DateTime('now + 5 minutes');        
+        $response->setExpires($expireDate);
+        //$response->headers->addCacheControlDirective('must-revalidate', true);
+        $response->setMaxAge(300);
+        return $response;
     }
 }

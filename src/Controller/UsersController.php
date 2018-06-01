@@ -172,9 +172,9 @@ class UsersController extends Controller
         // you can fetch the EntityManager via $this->getDoctrine()
         // or you can add an argument to your action: index(EntityManagerInterface $entityManager)
         $entityManager = $this->getDoctrine()->getManager();
-
+        $translator= $this->get('translator');
         $todo = new Todos();
-        $todo->setText("New Todo...");
+        $todo->setText($translator->trans("New Todo..."));
         $todo->setDateStart(new \DateTime("now"));
         $todo->setCreator($user->getIdUser());
         $todo->setState('0');

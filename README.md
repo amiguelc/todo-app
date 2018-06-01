@@ -17,7 +17,7 @@ The TODO table is done with VueJS with Ajax.</p>
 </ol>
 <h3>Roadmap</h3>
 <ol>
-    <li>Translation</li>
+    <li>Translation 80%</li>
     <li>Cache</li>
     <li>Units and functional tests</li>
     <li>Validation of data</li>

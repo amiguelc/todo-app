@@ -53,7 +53,7 @@ class Users implements UserInterface, \Serializable
     private $nickname;
 
     /**
-     * @Assert\Length(     *   
+     * @Assert\Length(
      *   max = 20,
      *   maxMessage = "Your name cannot be longer than {{ limit }} characters"
      * )
