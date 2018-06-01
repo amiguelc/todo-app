@@ -15,6 +15,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 //use Symfony\Component\HttpFoundation\JsonResponse;
 //use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use App\Form\UsersLocaleType;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UsersController extends Controller
 {
@@ -55,7 +57,9 @@ class UsersController extends Controller
             }
         }
         $defaults = array('locale' => $user->getLocale());
-        $form = $this->createFormBuilder($defaults, $options = array(
+        
+        $form = $this->createForm(UsersLocaleType::class, $defaults);
+        /*$form = $this->createFormBuilder($defaults, $options = array(
                 // enable/disable CSRF protection for this form
                 'csrf_protection' => true,
                 // the name of the hidden HTML field that stores the token
@@ -72,7 +76,7 @@ class UsersController extends Controller
                 'attr' => array('onChange' => 'saveLocale(this)'),
             ))
             ->getForm();
-        
+            */
 
         $count = $this->getDoctrine()->getRepository(Todos::class)->countTodos($user->getIdUser());
 
@@ -197,7 +201,7 @@ class UsersController extends Controller
      * @Route("/api/todos/edit", name="api_todos_edit")
      * @Security("has_role('ROLE_USER')")
      */
-    public function api_todos_edit(UserInterface $user)
+    public function api_todos_edit(UserInterface $user,ValidatorInterface $validator)
     {   
         $request = Request::createFromGlobals();
         // Falta validar
@@ -216,6 +220,7 @@ class UsersController extends Controller
                 $date_finish=new \Datetime($params["date_finish"]["date"]);
             }
             if (isset($params['state'])){ $state=$params["state"]; }
+
         } else { return new Response("No data"); }
 
         $entityManager = $this->getDoctrine()->getManager();
@@ -231,6 +236,19 @@ class UsersController extends Controller
             if (isset($params['date_start'])){ $todo->setDateStart($date_start); }
             if (isset($params['date_finish'])){ $todo->setDateFinish($date_finish); }
             if (isset($params['state'])){ $todo->setState($state); }            
+
+            //validate data, (when using forms Symfony does it automatically) 
+            $errors = $validator->validate($todo);
+            if (count($errors) > 0) {
+                /*
+                * Uses a __toString method on the $errors variable which is a
+                * ConstraintViolationList object. This gives us a nice string
+                * for debugging.
+                */
+                $errorsString = (string) $errors;
+
+                return new Response($errorsString);
+            }
 
             $entityManager->persist($todo);
             $entityManager->flush();

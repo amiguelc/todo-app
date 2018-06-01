@@ -1,13 +1,13 @@
 <h3>You did it! You registered!</h3>
 
-Hi {{ email }}! You're successfully registered.
-Token:  {{ token }}
-To activate your account you have to visit this link <a href="{{ url('verify_email') }}">Verify email</a>
+Hi {{ email }}! You're successfully registered.<br>
+To activate your account you have to visit this link <a href="{{ url('verify_email') }}">Verify email</a><br>
 
 {# example, assuming you have a route named "login" #}
-To login, go to: <a href="{{ url('login') }}">Login</a>.
+To login, go to: <a href="{{ url('login') }}">Login</a>.<br>
 
 Thanks!
 
+<br><br>Privacy Policy here
 {# Makes an absolute URL to the /images/logo.png file 
 <img src="{{ absolute_url(asset('images/logo.png')) }}"> #}

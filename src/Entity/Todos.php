@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TodosRepository")
@@ -17,11 +18,22 @@ class Todos
     private $id_todo;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @Assert\NotBlank()
+     * @Assert\Length(
+     *      min = 1,
+     *      max = 254,
+     *      minMessage = "Your todo name must be at least {{ limit }} characters long",
+     *      maxMessage = "Your todo name cannot be longer than {{ limit }} characters"
+     * )
+     * @ORM\Column(type="text", nullable=false)
      */
     private $text;
 
     /**
+   * @Assert\Length(
+     *      max = 2540,
+     *      maxMessage = "Your todo details cannot be longer than {{ limit }} characters"
+     * )
      * @ORM\Column(type="text", nullable=true)
      */
     private $details;

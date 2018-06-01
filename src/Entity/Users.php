@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UsersRepository")
@@ -18,22 +19,45 @@ class Users implements UserInterface, \Serializable
     private $idUser;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\NotNull()
+     * @Assert\Length(
+     *      min = 6,
+     *      max = 254,
+     *      minMessage = "Your first name must be at least {{ limit }} characters long",
+     *      maxMessage = "Your first name cannot be longer than {{ limit }} characters"
+     * )
+     *  * @Assert\Email(
+     *     message = "The email '{{ value }}' is not a valid email.",
+     *     checkMX = true
+     * )
+     * @ORM\Column(type="string", length=255, unique=true, nullable=false)
      */
     private $email;
 
     /**
+     * @Assert\Length(
+     *   min = 6,
+     *   max = 50,
+     *   minMessage = "Your password must be at least {{ limit }} characters long",
+     *   maxMessage = "Your password cannot be longer than {{ limit }} characters"
+     * )
      * @ORM\Column(type="string", length=64)
      */
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\NotBlank()
+     * @Assert\NotNull()
+     * @ORM\Column(type="string", length=255, unique=true, nullable=false)
      */
     private $nickname;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @Assert\Length(     *   
+     *   max = 20,
+     *   maxMessage = "Your name cannot be longer than {{ limit }} characters"
+     * )
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $name;
 
@@ -55,16 +79,25 @@ class Users implements UserInterface, \Serializable
     /* Config for showing TODOs*/
 
     /**
+     * @Assert\Type(
+     *     type="integer",
+     *     message="The value {{ value }} is not a valid {{ type }}."
+     * )
      * @ORM\Column(name="config_numrows", type="integer")
      */
     private $configNumRows = 20;
 
     /**
+     *  @Assert\Type(
+     *     type="integer",
+     *     message="The value {{ value }} is not a valid {{ type }}."
+     * )
      * @ORM\Column(name="config_showall", type="smallint")
      */
     private $configShowAll = 0;
 
     /**
+     * 
      * @ORM\Column(name="config_showdatestart", type="boolean")
      */
     private $configShowDateStart = false;
@@ -75,6 +108,7 @@ class Users implements UserInterface, \Serializable
     private $configShowDateFinish = false;
 
     /**
+     * @Assert\Choice({"en", "es_ES"})
      * @ORM\Column(type="string", length=20)
      */
     private $locale = "en";

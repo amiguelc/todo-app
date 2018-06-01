@@ -28,20 +28,20 @@
     <div class="content-dash">
         
         <div id="app" style='visibility:hidden;' v-bind:style="{ visibility: visibility }">
-            <h1> Lista de Todos </h1> <button id="showModalEditConfig" @click="showModalEditConfig=true">Config</button><button id="filters">Filters</button>
+            <h1> {% trans %}TODOs List{% endtrans %} </h1> <button id="showModalEditConfig" @click="showModalEditConfig=true">Config</button><button id="filters">{% trans %}Filters{% endtrans %}</button>
             <table class='table table-stripered table-bordered'>
                 <thead>
                     <tr>
                         <td style='width:50px;'></td>
                         
                         <td style='width:100%;'>Todo</td> <!--<button style="float:right;">Filters</button></td> -->
-                        <td class="col_date_start" v-if="config.showDateStart=='true'">Date Start</td>
-                        <td v-if="config.showDateFinish=='true'">Date Finish</td>
-                        <td style='width:50px;'>Actions</td>
+                        <td class="col_date_start" v-if="config.showDateStart=='true'">{% trans %}Date Start{% endtrans %}</td>
+                        <td v-if="config.showDateFinish=='true'">{% trans %}Date Finish{% endtrans %}</td>
+                        <td style='width:50px;'>{% trans %}Actions{% endtrans %}</td>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-if="isEmpty()"><td></td><td>Empty</td></tr>
+                    <tr v-if="isEmpty()"><td></td><td>{% trans %}Empty{% endtrans %}</td></tr>
                     <tr v-for="(item, index) in visiblesTodos" :idtodo="item.id_todo">
                         <td>
                             <div class="form-check">
@@ -62,7 +62,7 @@
                                 <input class="form-check-input" type="checkbox" :checked="config.showAll" @click="toggleShowAll()">
                             </div>
                         </td>
-                        <td :colspan="numTableCols-2">Show all</td>
+                        <td :colspan="numTableCols-2">{% trans %}Show all{% endtrans %}</td>
                         <td><img @click="addTodo" class='icon' src="{{ asset('images/add_icon.png') }}"></td>
                     </tr>
                 </tfoot>
@@ -78,24 +78,24 @@
                 <h3 slot="header">Editar Todo</h3>
                 <h3 slot="body">Texto</h3> 
                 <h3 slot="footer">Guardar</h3> -->
-                <h3 slot="header">Editar Todo</h3>
+                <h3 slot="header">{% trans %}Edit Todo{% endtrans %}</h3>
                 <div slot="body">
                     <!-- id _todo ${ this.ModalData.id_todo } <br> -->
                     Id <span>${todos[ModalEditTodoIndex].id_todo}</span><br>
-                    Estado <input type='checkbox' v-model="todos[ModalEditTodoIndex].state" @click="toggleState(todos[ModalEditTodoIndex])">
-                    <span v-if="todos[ModalEditTodoIndex].state==1"> Completed</span><span v-else> Uncompleted</span><br>
+                    {% trans %}State{% endtrans %} <input type='checkbox' v-model="todos[ModalEditTodoIndex].state" @click="toggleState(todos[ModalEditTodoIndex])">
+                    <span v-if="todos[ModalEditTodoIndex].state==1"> {% trans %}Done{% endtrans %}</span><span v-else> {% trans %}Undone{% endtrans %}</span><br>
                     <div>
                         <label class="left" for="modal_todo">Todo:</label>
                         <span class="left2"><input type="text" id='modal_todo' name='modal_todo' style="float:left;width:100%;" v-model="todos[ModalEditTodoIndex].text"></span>
                     </div>
-                    <div style='clear:left'>Details <textarea style='resize:vertical;width:100%' v-model="todos[ModalEditTodoIndex].details"></textarea></div><br>
+                    <div style='clear:left'>{% trans %}Details{% endtrans %} <textarea style='resize:vertical;width:100%' v-model="todos[ModalEditTodoIndex].details"></textarea></div><br>
                     <table>
-                    <tr><td>Fecha Creación</td>
+                    <tr><td>{% trans %}Date Creation{% endtrans %}</td>
                         <td><input type='date' disabled :value="PHPdatetimetoJSdate(todos[ModalEditTodoIndex].date_creation.date)">
                             <input type='time' disabled :value="PHPdatetimetoJStime(todos[ModalEditTodoIndex].date_creation.date)">
                         </td>
                     </tr>
-                    <tr><td>Fecha Inicio </td><td>
+                    <tr><td>{% trans %}Date Start{% endtrans %} </td><td>
                     <div style="display:inline-block;" v-if="todos[ModalEditTodoIndex].date_start!==null">
                         <input type='date' :value="PHPdatetimetoJSdate(todos[ModalEditTodoIndex].date_start.date)" @change="changedDate_Start(ModalEditTodoIndex, $event)">
                         <input type='time' :value="PHPdatetimetoJStime(todos[ModalEditTodoIndex].date_start.date)" @change="changedDate_Start(ModalEditTodoIndex, $event)">
@@ -105,7 +105,7 @@
                         <input type='time' @change="changedDate_Start(ModalEditTodoIndex, $event)">
                     </div>
                     </td></tr>
-                    <tr><td>Fecha Final </td><td>
+                    <tr><td>{% trans %}Date Finish{% endtrans %} </td><td>
                     <div style="display:inline-block;" v-if="todos[ModalEditTodoIndex].date_finish!==null">
                         <input type='date' :value="PHPdatetimetoJSdate(todos[ModalEditTodoIndex].date_finish.date)"  @change="changedDate_Finish(ModalEditTodoIndex, $event)">
                         <input type='time' :value="PHPdatetimetoJStime(todos[ModalEditTodoIndex].date_finish.date)"  @change="changedDate_Finish(ModalEditTodoIndex, $event)">
@@ -120,7 +120,7 @@
                 <div slot="footer">
                     
                     <button class="modal-default-button" @click="saveEditedTodo(ModalEditTodoIndex)"> <!-- showModal = false o @click="$emit('close')"-->
-                            Guardar
+                            {% trans %}Guardar{% endtrans %}
                     </button>
                 </div>
             </modal>
@@ -133,7 +133,7 @@
                 <h3 slot="header">Editar Todo</h3>
                 <h3 slot="body">Texto</h3> 
                 <h3 slot="footer">Guardar</h3> -->
-                <h3 slot="header">Editar Config</h3>
+                <h3 slot="header">{% trans %}Edit Config{% endtrans %}</h3>
                 <div slot="body">
                     <table>
                         <tr><td>NumRows</td><td><input type="number" v-model="config.numRows"></td></tr>
@@ -151,7 +151,7 @@
                 <div slot="footer">
                     
                     <button class="modal-default-button" @click="saveEditedConfig"> <!-- showModal = false o @click="$emit('close')"-->
-                            Guardar
+                            {% trans %}Guardar{% endtrans %}
                     </button>
                 </div>
             </modal>

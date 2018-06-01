@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 //use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use App\Form\UsersRegisterType;
 
 class SecurityController extends Controller
 {
@@ -30,6 +31,9 @@ class SecurityController extends Controller
     {
         $user = new Users();
 
+        //$defaults = array('locale' => $user->getLocale());
+        $form = $this->createForm(UsersRegisterType::class, $user);
+        /*
         $form = $this->createFormBuilder($user)
             ->add('email', EmailType::class)
             ->add('password', RepeatedType::class, array(
@@ -47,6 +51,7 @@ class SecurityController extends Controller
             ))            
             ->add('save', SubmitType::class, array('label' => 'Register'))
             ->getForm();
+        */
 
         $form->handleRequest($request);
 
