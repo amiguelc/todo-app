@@ -327,4 +327,13 @@ class UsersController extends Controller
             }   
         return null;        
     }
+
+
+    /**
+     * @Route("/api/users/logged", name="api_users_logged")
+     * @Security("has_role('ROLE_USER')")
+     */
+    public function api_users_logged(){
+        return new Response("Connected");
+    }
 }
